@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
@@ -28,16 +29,19 @@ export default function ProductCard({ product, index = 0 }) {
       >
         {/* Image Container */}
         <div className="relative aspect-square bg-neutral-100 dark:bg-neutral-800 rounded-2xl overflow-hidden mb-4">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          />
+          {/* Clickable Image Link */}
+          <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            />
+          </Link>
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 pointer-events-none">
             {product.isNew && <Badge variant="new">New</Badge>}
             {product.isSale && <Badge variant="sale">Sale</Badge>}
           </div>
@@ -48,7 +52,7 @@ export default function ProductCard({ product, index = 0 }) {
             whileTap={{ scale: 0.95 }}
             onClick={() => toggleItem(product)}
             className={cn(
-              "absolute top-3 right-3 p-2 rounded-full transition-colors",
+              "absolute top-3 right-3 p-2 rounded-full transition-colors z-20",
               isWishlisted
                 ? "bg-red-500 text-white"
                 : "bg-white/80 dark:bg-black/80 hover:bg-white dark:hover:bg-black"
@@ -61,7 +65,7 @@ export default function ProductCard({ product, index = 0 }) {
           </motion.button>
 
           {/* Action Buttons - Always visible on mobile, hover on desktop */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 z-20">
             <div className="flex gap-2">
               <motion.button
                 whileTap={{ scale: 0.98 }}
@@ -83,12 +87,14 @@ export default function ProductCard({ product, index = 0 }) {
           </div>
         </div>
 
-        {/* Product Info */}
-        <div className="space-y-1">
+        {/* Product Info - Clickable */}
+        <Link href={`/product/${product.id}`} className="block space-y-1">
           <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
             {product.category}
           </p>
-          <h3 className="font-medium truncate">{product.name}</h3>
+          <h3 className="font-medium truncate hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors">
+            {product.name}
+          </h3>
           <div className="flex items-center gap-2">
             <span className="font-semibold">{formatPrice(product.price)}</span>
             {product.originalPrice && (
@@ -97,7 +103,7 @@ export default function ProductCard({ product, index = 0 }) {
               </span>
             )}
           </div>
-        </div>
+        </Link>
       </motion.div>
 
       {/* Quick View Modal */}

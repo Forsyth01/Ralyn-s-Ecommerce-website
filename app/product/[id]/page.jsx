@@ -370,7 +370,16 @@ export default function ProductPage() {
         {relatedProducts.length > 0 && (
           <section className="mt-24">
             <h2 className="text-2xl font-bold mb-8">You May Also Like</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {/* Horizontal scroll on mobile, grid on desktop */}
+            <div className="md:hidden flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+              {relatedProducts.map((relatedProduct) => (
+                <div key={relatedProduct.id} className="shrink-0 w-70 snap-start">
+                  <ProductCard product={relatedProduct} />
+                </div>
+              ))}
+            </div>
+            {/* Grid on tablet and desktop */}
+            <div className="hidden md:grid md:grid-cols-4 gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <ProductCard key={relatedProduct.id} product={relatedProduct} />
               ))}

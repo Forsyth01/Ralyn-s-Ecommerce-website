@@ -74,3 +74,13 @@ body {
 .Toastify__toast {
   font-family: var(--font-sans), "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
