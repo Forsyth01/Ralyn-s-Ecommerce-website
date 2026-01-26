@@ -1,0 +1,113 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Heart, ShoppingBag, Eye } from "lucide-react";
+import { useCart } from "@/app/context/CartContext";
+import { useWishlist } from "@/app/context/WishlistContext";
+import { formatPrice, cn } from "@/app/lib/utils";
+import Badge from "@/app/components/ui/Badge";
+import ProductQuickView from "./ProductQuickView";
+
+export default function ProductCard({ product, index = 0 }) {
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const { addItem: addToCart } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
+
+  const isWishlisted = isInWishlist(product.id);
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className="group"
+      >
+        {/* Image Container */}
+        <div className="relative aspect-square bg-neutral-100 dark:bg-neutral-800 rounded-2xl overflow-hidden mb-4">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
+
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
+            {product.isNew && <Badge variant="new">New</Badge>}
+            {product.isSale && <Badge variant="sale">Sale</Badge>}
+          </div>
+
+          {/* Wishlist Button */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => toggleItem(product)}
+            className={cn(
+              "absolute top-3 right-3 p-2 rounded-full transition-colors",
+              isWishlisted
+                ? "bg-red-500 text-white"
+                : "bg-white/80 dark:bg-black/80 hover:bg-white dark:hover:bg-black"
+            )}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart
+              className={cn("w-5 h-5", isWishlisted && "fill-current")}
+            />
+          </motion.button>
+
+          {/* Hover Actions */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <div className="flex gap-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => addToCart(product)}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white dark:bg-white dark:text-black rounded-full font-medium text-sm transition-colors hover:bg-neutral-800 dark:hover:bg-neutral-200"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Add to Cart
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsQuickViewOpen(true)}
+                className="p-3 bg-white dark:bg-black rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                aria-label="Quick view"
+              >
+                <Eye className="w-5 h-5" />
+              </motion.button>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Info */}
+        <div className="space-y-1">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+            {product.category}
+          </p>
+          <h3 className="font-medium truncate">{product.name}</h3>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">{formatPrice(product.price)}</span>
+            {product.originalPrice && (
+              <span className="text-sm text-neutral-400 line-through">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Quick View Modal */}
+      <ProductQuickView
+        product={product}
+        isOpen={isQuickViewOpen}
+        onClose={() => setIsQuickViewOpen(false)}
+      />
+    </>
+  );
+}
