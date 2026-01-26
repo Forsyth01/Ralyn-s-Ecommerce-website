@@ -60,11 +60,10 @@ export default function ProductCard({ product, index = 0 }) {
             />
           </motion.button>
 
-          {/* Hover Actions */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          {/* Action Buttons - Always visible on mobile, hover on desktop */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
             <div className="flex gap-2">
               <motion.button
-                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => addToCart(product)}
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white dark:bg-white dark:text-black rounded-full font-medium text-sm transition-colors hover:bg-neutral-800 dark:hover:bg-neutral-200"
@@ -73,7 +72,6 @@ export default function ProductCard({ product, index = 0 }) {
                 Add to Cart
               </motion.button>
               <motion.button
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsQuickViewOpen(true)}
                 className="p-3 bg-white dark:bg-black rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
