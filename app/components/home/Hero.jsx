@@ -23,7 +23,7 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
             className="text-sm md:text-base font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-4"
           >
-            Welcome to Raylns
+            Welcome to Ralyn's Limited
           </motion.p>
 
           <motion.h1

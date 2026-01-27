@@ -1,4 +1,4 @@
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/app/components/Providers";
 import Navbar from "@/app/components/layout/Navbar";
@@ -17,8 +17,14 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-logo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata = {
-  title: "Raylns | Jewelry, Lipgloss & Gadgets",
+  title: "Ralyn's Limited | Jewelry, Lipgloss & Gadgets",
   description: "Discover your style with our curated collection of Jewelry, Lipgloss, and Gadgets.",
 };
 
@@ -26,7 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${plusJakarta.variable} ${plusJakarta.className} ${jetbrainsMono.variable} antialiased`}
+        className={`${plusJakarta.variable} ${plusJakarta.className} ${jetbrainsMono.variable} ${playfair.variable} antialiased`}
       >
         <Providers>
           <Navbar />

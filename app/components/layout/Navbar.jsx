@@ -54,6 +54,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
               <motion.span
                 className="text-xl md:text-2xl font-semibold tracking-tight"
+                style={{ fontFamily: "var(--font-logo)" }}
                 whileHover={{ scale: 1.02 }}
               >
                 {SITE_NAME}

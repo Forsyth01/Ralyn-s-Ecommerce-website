@@ -70,7 +70,7 @@ export default function SettingsPage() {
   const { isDark, toggleTheme } = useTheme();
 
   const [settings, setSettings] = useState({
-    storeName: "Raylns",
+    storeName: "Ralyn's Limited",
     storeEmail: "hello@raylns.com",
     storePhone: "+234 801 234 5678",
     storeAddress: "123 Victoria Island, Lagos, Nigeria",

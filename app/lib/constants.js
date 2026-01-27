@@ -1,4 +1,4 @@
-export const SITE_NAME = "Raylns";
+export const SITE_NAME = "Ralyn's Ltd";
 export const SITE_DESCRIPTION = "Discover your style with our curated collection of Jewelry, Lipgloss, and Gadgets.";
 
 export const NAV_LINKS = [

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/app/context/ThemeContext";
 import { cn } from "@/app/lib/utils";
+import { createClient } from "@/app/lib/supabase/client";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -32,6 +33,7 @@ const navItems = [
 export default function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
 
   // Hide main site navbar, footer, cart drawer, wishlist drawer
@@ -42,6 +44,13 @@ export default function AdminLayout({ children }) {
       document.body.style.overflow = "";
     };
   }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/admin/login");
+    router.refresh();
+  };
 
   const currentPage = navItems.find((item) => item.href === pathname)?.label || "Dashboard";
 
@@ -56,7 +65,7 @@ export default function AdminLayout({ children }) {
               <span className="text-white dark:text-black font-bold text-lg">R</span>
             </div>
             <div>
-              <span className="font-bold text-lg block leading-tight">Raylns</span>
+              <span className="font-bold text-lg block leading-tight italic" style={{ fontFamily: "var(--font-logo)" }}>Ralyn's</span>
               <span className="text-xs text-neutral-400">Admin Panel</span>
             </div>
           </Link>
@@ -93,13 +102,13 @@ export default function AdminLayout({ children }) {
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             {isDark ? "Light Mode" : "Dark Mode"}
           </button>
-          <Link
-            href="/"
+          <button
+            onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
           >
             <LogOut className="w-5 h-5" />
-            Exit Admin
-          </Link>
+            Logout
+          </button>
         </div>
       </aside>
 
@@ -132,7 +141,7 @@ export default function AdminLayout({ children }) {
                 <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center">
                   <span className="text-white dark:text-black font-bold text-lg">R</span>
                 </div>
-                <span className="font-bold text-lg">Raylns</span>
+                <span className="font-bold text-lg italic" style={{ fontFamily: "var(--font-logo)" }}>Ralyn's</span>
               </Link>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -174,14 +183,16 @@ export default function AdminLayout({ children }) {
                 {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 {isDark ? "Light Mode" : "Dark Mode"}
               </button>
-              <Link
-                href="/"
-                onClick={() => setSidebarOpen(false)}
+              <button
+                onClick={() => {
+                  setSidebarOpen(false);
+                  handleLogout();
+                }}
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
               >
                 <LogOut className="w-5 h-5" />
-                Exit Admin
-              </Link>
+                Logout
+              </button>
             </div>
           </motion.aside>
         )}
