@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Container from "@/app/components/layout/Container";
 import ProductGrid from "@/app/components/products/ProductGrid";
@@ -8,11 +9,21 @@ import CategoryFilter from "@/app/components/products/CategoryFilter";
 import SearchBar from "@/app/components/products/SearchBar";
 import { createClient } from "@/app/lib/supabase/client";
 
-export default function ShopPage() {
+function ShopContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState(categoryParam || "all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Sync category from URL when navigating from homepage categories
+  useEffect(() => {
+    if (categoryParam) {
+      setActiveCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -108,5 +119,19 @@ export default function ShopPage() {
         )}
       </Container>
     </section>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-20">
+          <div className="w-8 h-8 border-2 border-neutral-300 border-t-black dark:border-neutral-600 dark:border-t-white rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <ShopContent />
+    </Suspense>
   );
 }

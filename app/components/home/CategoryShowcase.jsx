@@ -28,7 +28,7 @@ export default function CategoryShowcase() {
         </motion.div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -39,7 +39,7 @@ export default function CategoryShowcase() {
             >
               <Link
                 href={`/shop?category=${category.slug}`}
-                className="group block relative aspect-[4/3] rounded-2xl overflow-hidden"
+                className="group block relative aspect-3/4 md:aspect-4/3 rounded-2xl overflow-hidden"
               >
                 {/* Image */}
                 <Image
@@ -47,7 +47,7 @@ export default function CategoryShowcase() {
                   alt={category.name}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
 
                 {/* Overlay */}

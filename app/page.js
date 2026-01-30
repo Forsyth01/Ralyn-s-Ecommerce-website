@@ -9,7 +9,7 @@ export default function Home() {
       <Hero />
       <FeaturedProducts />
       <CategoryShowcase />
-      <Newsletter />
+      {/* <Newsletter /> */}
     </>
   );
 }
