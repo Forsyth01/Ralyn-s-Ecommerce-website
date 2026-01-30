@@ -62,7 +62,7 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
   };
 
   const handleTwitterShare = () => {
-    const text = `Check out ${product.name} from Raylns!`;
+    const text = `Check out ${product.name} from Ralyn's Limited!`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(productUrl)}`,
       "_blank"
@@ -120,11 +120,11 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                   </div>
                   {/* Badges */}
                   <div className="absolute top-6 left-6 flex flex-col gap-2">
-                    {product.isNew && <Badge variant="new">New Arrival</Badge>}
-                    {product.isSale && (
+                    {(product.is_new || product.isNew) && <Badge variant="new">New Arrival</Badge>}
+                    {(product.is_sale || product.isSale) && (
                       <Badge variant="sale">
-                        {product.originalPrice &&
-                          `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`}
+                        {(product.original_price || product.originalPrice) &&
+                          `${Math.round((((product.original_price || product.originalPrice) - product.price) / (product.original_price || product.originalPrice)) * 100)}% OFF`}
                       </Badge>
                     )}
                   </div>
@@ -221,7 +221,7 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                       ))}
                     </div>
                     <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                      {product.rating} ({product.reviews} reviews)
+                      {product.rating || 0} ({product.reviews_count || product.reviews || 0} reviews)
                     </span>
                   </div>
 
@@ -230,9 +230,9 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                     <span className="text-4xl font-bold">
                       {formatPrice(product.price)}
                     </span>
-                    {product.originalPrice && (
+                    {(product.original_price || product.originalPrice) && (
                       <span className="text-xl text-neutral-400 line-through">
-                        {formatPrice(product.originalPrice)}
+                        {formatPrice(product.original_price || product.originalPrice)}
                       </span>
                     )}
                   </div>
@@ -305,7 +305,7 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
 
                   {/* Stock Status & Info */}
                   <div className="flex items-center gap-6 mt-8 text-sm">
-                    {product.inStock ? (
+                    {(product.in_stock !== undefined ? product.in_stock : product.inStock) ? (
                       <span className="flex items-center gap-2 text-green-600 dark:text-green-400">
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         In Stock
@@ -337,8 +337,8 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                   />
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    {product.isNew && <Badge variant="new">New</Badge>}
-                    {product.isSale && <Badge variant="sale">Sale</Badge>}
+                    {(product.is_new || product.isNew) && <Badge variant="new">New</Badge>}
+                    {(product.is_sale || product.isSale) && <Badge variant="sale">Sale</Badge>}
                   </div>
                 </div>
 
@@ -410,7 +410,7 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                       ))}
                     </div>
                     <span className="text-sm text-neutral-500">
-                      ({product.reviews})
+                      ({product.reviews_count || product.reviews || 0})
                     </span>
                   </div>
 
@@ -419,9 +419,9 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
                     <span className="text-2xl font-bold">
                       {formatPrice(product.price)}
                     </span>
-                    {product.originalPrice && (
+                    {(product.original_price || product.originalPrice) && (
                       <span className="text-lg text-neutral-400 line-through">
-                        {formatPrice(product.originalPrice)}
+                        {formatPrice(product.original_price || product.originalPrice)}
                       </span>
                     )}
                   </div>
@@ -482,7 +482,7 @@ export default function ProductQuickView({ product, isOpen, onClose }) {
 
                   {/* Stock Status */}
                   <p className="text-sm mt-4">
-                    {product.inStock ? (
+                    {(product.in_stock !== undefined ? product.in_stock : product.inStock) ? (
                       <span className="text-green-600">In Stock</span>
                     ) : (
                       <span className="text-red-500">Out of Stock</span>

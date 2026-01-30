@@ -24,7 +24,7 @@ import { toast } from "react-toastify";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { formatPrice, cn } from "@/app/lib/utils";
-import { getProductById, products } from "@/app/data/products";
+import { createClient } from "@/app/lib/supabase/client";
 import Container from "@/app/components/layout/Container";
 import Button from "@/app/components/ui/Button";
 import Badge from "@/app/components/ui/Badge";
@@ -33,21 +33,50 @@ import ProductCard from "@/app/components/products/ProductCard";
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const { addItem: addToCart } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
 
-  const productId = parseInt(params.id);
-  const product = getProductById(productId);
+  useEffect(() => {
+    async function fetchProduct() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", params.id)
+        .single();
 
-  // Get related products from same category
-  const relatedProducts = product
-    ? products
-        .filter((p) => p.category === product.category && p.id !== product.id)
-        .slice(0, 4)
-    : [];
+      if (error) {
+        console.error("Error fetching product:", error);
+        setLoading(false);
+        return;
+      }
+
+      setProduct(data);
+
+      // Fetch related products
+      if (data) {
+        const { data: related } = await supabase
+          .from("products")
+          .select("*")
+          .eq("category", data.category)
+          .neq("id", data.id)
+          .limit(4);
+
+        setRelatedProducts(related || []);
+      }
+
+      setLoading(false);
+    }
+
+    fetchProduct();
+  }, [params.id]);
 
   const isWishlisted = product ? isInWishlist(product.id) : false;
   const productUrl =
@@ -55,8 +84,16 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
+    const sizes = product.sizes || [];
+    if (sizes.length > 0 && !selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    const productWithSize = selectedSize
+      ? { ...product, selectedSize }
+      : product;
     for (let i = 0; i < quantity; i++) {
-      addToCart(product);
+      addToCart(productWithSize);
     }
   };
 
@@ -80,13 +117,26 @@ export default function ProductPage() {
 
   const handleTwitterShare = () => {
     if (!product) return;
-    const text = `Check out ${product.name} from Raylns!`;
+    const text = `Check out ${product.name} from Ralyn's Limited!`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(productUrl)}`,
       "_blank"
     );
     setShowShareMenu(false);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black pt-24 pb-16">
+        <Container>
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-neutral-300 border-t-black dark:border-neutral-600 dark:border-t-white rounded-full animate-spin" />
+          </div>
+        </Container>
+      </main>
+    );
+  }
 
   // Product not found
   if (!product) {
@@ -105,6 +155,8 @@ export default function ProductPage() {
       </main>
     );
   }
+
+  const sizes = product.sizes || [];
 
   return (
     <main className="min-h-screen bg-white dark:bg-black pt-24 pb-16">
@@ -137,11 +189,11 @@ export default function ProductPage() {
               />
               {/* Badges */}
               <div className="absolute top-6 left-6 flex flex-col gap-2">
-                {product.isNew && <Badge variant="new">New Arrival</Badge>}
-                {product.isSale && (
+                {product.is_new && <Badge variant="new">New Arrival</Badge>}
+                {product.is_sale && (
                   <Badge variant="sale">
-                    {product.originalPrice &&
-                      `${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF`}
+                    {product.original_price &&
+                      `${Math.round(((product.original_price - product.price) / product.original_price) * 100)}% OFF`}
                   </Badge>
                 )}
               </div>
@@ -177,7 +229,7 @@ export default function ProductPage() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 top-12 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-2 min-w-[180px] z-30"
+                      className="absolute right-0 top-12 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-2 min-w-45 z-30"
                     >
                       <button
                         onClick={handleCopyLink}
@@ -231,7 +283,7 @@ export default function ProductPage() {
                     key={i}
                     className={cn(
                       "w-5 h-5",
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.rating || 0)
                         ? "text-yellow-400 fill-yellow-400"
                         : "text-neutral-300 dark:text-neutral-600"
                     )}
@@ -239,7 +291,7 @@ export default function ProductPage() {
                 ))}
               </div>
               <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                {product.rating} ({product.reviews} reviews)
+                {product.rating || 0} ({product.reviews_count || 0} reviews)
               </span>
             </div>
 
@@ -248,9 +300,9 @@ export default function ProductPage() {
               <span className="text-4xl font-bold">
                 {formatPrice(product.price)}
               </span>
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="text-xl text-neutral-400 line-through">
-                  {formatPrice(product.originalPrice)}
+                  {formatPrice(product.original_price)}
                 </span>
               )}
             </div>
@@ -259,6 +311,36 @@ export default function ProductPage() {
             <p className="text-neutral-600 dark:text-neutral-400 mt-6 leading-relaxed text-lg">
               {product.description}
             </p>
+
+            {/* Size Selector */}
+            {sizes.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold uppercase tracking-wider">
+                    Size
+                  </span>
+                  {selectedSize && (
+                    <span className="text-sm text-neutral-500">{selectedSize}</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={cn(
+                        "min-w-12 h-12 px-4 rounded-xl text-sm font-medium transition-all border",
+                        selectedSize === size
+                          ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white"
+                          : "bg-transparent border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white"
+                      )}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <div className="border-t border-neutral-200 dark:border-neutral-800 my-8" />
@@ -317,7 +399,7 @@ export default function ProductPage() {
 
             {/* Stock Status */}
             <div className="flex items-center gap-6 mt-6 text-sm">
-              {product.inStock ? (
+              {product.in_stock ? (
                 <span className="flex items-center gap-2 text-green-600 dark:text-green-400">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                   In Stock

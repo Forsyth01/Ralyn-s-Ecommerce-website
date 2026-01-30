@@ -46,7 +46,13 @@ export default function AboutPage() {
             About <span className="font-semibold">Raylns</span>
           </h1>
           <p className="text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            Founded with a passion for style and quality, Raylns is your destination for curated jewelry, beauty products, and tech accessories that help you express your unique personality.
+          
+
+RayIns was founded with a passion for quality, reliability, and style. We are committed to connecting our customers with carefully sourced products and dependable logistics solutions that make everyday life easier and more enjoyable.
+
+From fashion and beauty essentials to gadgets and electronics, we focus on delivering authentic products, seamless procurement, and timely delivery, both locally and internationally. At RayIns, customer satisfaction is at the heart of everything we do.
+
+We don’t just sell products — we provide solutions you can trust.
           </p>
         </motion.div>
 

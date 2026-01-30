@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Eye,
@@ -13,16 +13,33 @@ import {
   User,
 } from "lucide-react";
 import { formatPrice, cn } from "@/app/lib/utils";
-import { mockCustomers, mockOrders } from "../data/mockData";
+import { createClient } from "@/app/lib/supabase/client";
 import DataTable from "../components/DataTable";
 import StatCard from "../components/StatCard";
 
 function CustomerDetailsModal({ customer, onClose }) {
+  const [customerOrders, setCustomerOrders] = useState([]);
+
+  useEffect(() => {
+    if (!customer) return;
+    async function fetchOrders() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("customer_id", customer.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setCustomerOrders(data || []);
+    }
+    fetchOrders();
+  }, [customer]);
+
   if (!customer) return null;
 
-  const customerOrders = mockOrders.filter(
-    (order) => order.customer === customer.name
-  );
+  const ordersCount = customer.orders_count || 0;
+  const totalSpent = Number(customer.total_spent) || 0;
+  const avgOrder = ordersCount > 0 ? Math.round(totalSpent / ordersCount) : 0;
 
   return (
     <motion.div
@@ -54,7 +71,7 @@ function CustomerDetailsModal({ customer, onClose }) {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-white">
-                {customer.name.charAt(0)}
+                {customer.name?.charAt(0) || "?"}
               </span>
             </div>
             <div>
@@ -89,7 +106,7 @@ function CustomerDetailsModal({ customer, onClose }) {
               </div>
               <div>
                 <p className="text-xs text-neutral-500">Phone</p>
-                <p className="font-medium text-sm">{customer.phone}</p>
+                <p className="font-medium text-sm">{customer.phone || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -97,17 +114,15 @@ function CustomerDetailsModal({ customer, onClose }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
-              <p className="text-2xl font-bold">{customer.orders}</p>
+              <p className="text-2xl font-bold">{ordersCount}</p>
               <p className="text-xs text-neutral-500 mt-1">Total Orders</p>
             </div>
             <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
-              <p className="text-2xl font-bold">{formatPrice(customer.totalSpent)}</p>
+              <p className="text-2xl font-bold">{formatPrice(totalSpent)}</p>
               <p className="text-xs text-neutral-500 mt-1">Total Spent</p>
             </div>
             <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
-              <p className="text-2xl font-bold">
-                {formatPrice(Math.round(customer.totalSpent / customer.orders))}
-              </p>
+              <p className="text-2xl font-bold">{formatPrice(avgOrder)}</p>
               <p className="text-xs text-neutral-500 mt-1">Avg. Order</p>
             </div>
           </div>
@@ -117,7 +132,7 @@ function CustomerDetailsModal({ customer, onClose }) {
             <h4 className="font-semibold mb-3">Recent Orders</h4>
             {customerOrders.length > 0 ? (
               <div className="space-y-2">
-                {customerOrders.slice(0, 3).map((order) => (
+                {customerOrders.map((order) => (
                   <div
                     key={order.id}
                     className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl"
@@ -127,9 +142,9 @@ function CustomerDetailsModal({ customer, onClose }) {
                         <ShoppingBag className="w-4 h-4 text-neutral-500" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{order.id}</p>
+                        <p className="font-medium text-sm">{order.order_number}</p>
                         <p className="text-xs text-neutral-500">
-                          {new Date(order.date).toLocaleDateString("en-NG")}
+                          {new Date(order.created_at).toLocaleDateString("en-NG")}
                         </p>
                       </div>
                     </div>
@@ -146,15 +161,15 @@ function CustomerDetailsModal({ customer, onClose }) {
             )}
           </div>
 
-          {/* Last Order */}
+          {/* Joined Date */}
           <div className="flex items-center gap-3 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
             <div className="w-10 h-10 bg-white dark:bg-neutral-800 rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-neutral-500" />
             </div>
             <div>
-              <p className="text-xs text-neutral-500">Last Order</p>
+              <p className="text-xs text-neutral-500">Customer Since</p>
               <p className="font-medium text-sm">
-                {new Date(customer.lastOrder).toLocaleDateString("en-NG", {
+                {new Date(customer.created_at).toLocaleDateString("en-NG", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
@@ -169,8 +184,27 @@ function CustomerDetailsModal({ customer, onClose }) {
 }
 
 export default function CustomersPage() {
-  const [customers] = useState(mockCustomers);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  useEffect(() => {
+    async function fetchCustomers() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching customers:", error);
+      } else {
+        setCustomers(data || []);
+      }
+      setLoading(false);
+    }
+    fetchCustomers();
+  }, []);
 
   const columns = [
     {
@@ -180,7 +214,7 @@ export default function CustomersPage() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
             <span className="text-sm font-medium text-white">
-              {value.charAt(0)}
+              {value?.charAt(0) || "?"}
             </span>
           </div>
           <div>
@@ -193,22 +227,22 @@ export default function CustomersPage() {
     {
       key: "phone",
       label: "Phone",
-      render: (value) => <span className="text-sm">{value}</span>,
+      render: (value) => <span className="text-sm">{value || "N/A"}</span>,
     },
     {
-      key: "orders",
+      key: "orders_count",
       label: "Orders",
       sortable: true,
       render: (value) => (
-        <span className="font-medium">{value}</span>
+        <span className="font-medium">{value || 0}</span>
       ),
     },
     {
-      key: "totalSpent",
+      key: "total_spent",
       label: "Total Spent",
       sortable: true,
       render: (value) => (
-        <span className="font-medium">{formatPrice(value)}</span>
+        <span className="font-medium">{formatPrice(Number(value) || 0)}</span>
       ),
     },
     {
@@ -231,10 +265,17 @@ export default function CustomersPage() {
 
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter((c) => c.status === "active").length;
-  const totalRevenue = customers.reduce((acc, c) => acc + c.totalSpent, 0);
-  const avgOrderValue = Math.round(
-    totalRevenue / customers.reduce((acc, c) => acc + c.orders, 0)
-  );
+  const totalRevenue = customers.reduce((acc, c) => acc + (Number(c.total_spent) || 0), 0);
+  const totalOrders = customers.reduce((acc, c) => acc + (c.orders_count || 0), 0);
+  const avgOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-2 border-neutral-300 border-t-black dark:border-neutral-600 dark:border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -258,7 +299,7 @@ export default function CustomersPage() {
         <StatCard
           title="Active Customers"
           value={activeCustomers}
-          change={`${Math.round((activeCustomers / totalCustomers) * 100)}% of total`}
+          change={totalCustomers > 0 ? `${Math.round((activeCustomers / totalCustomers) * 100)}% of total` : "0%"}
           changeType="neutral"
           icon={TrendingUp}
           iconBg="bg-green-500"

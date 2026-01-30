@@ -9,6 +9,7 @@ import { ArrowLeft, CreditCard, Truck, Shield, Check, Building2 } from "lucide-r
 import { toast } from "react-toastify";
 import { useCart } from "@/app/context/CartContext";
 import { formatPrice } from "@/app/lib/utils";
+import { createOrder } from "@/app/lib/actions/orders";
 import Container from "@/app/components/layout/Container";
 import Button from "@/app/components/ui/Button";
 import Input from "@/app/components/ui/Input";
@@ -126,13 +127,49 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const orderItems = items.map((item) => ({
+        id: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+        selectedSize: item.product.selectedSize || null,
+      }));
 
-    setIsProcessing(false);
-    setOrderComplete(true);
-    clearCart();
-    toast.success("Order placed successfully!");
+      const result = await createOrder({
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        address: formData.apartment
+          ? `${formData.address}, ${formData.apartment}`
+          : formData.address,
+        city: formData.city,
+        state: formData.state,
+        items: orderItems,
+        itemsCount: itemCount,
+        subtotal,
+        shipping,
+        total,
+        paymentMethod,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+        setIsProcessing(false);
+        return;
+      }
+
+      setIsProcessing(false);
+      setOrderComplete(true);
+      clearCart();
+      toast.success("Order placed successfully!");
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Something went wrong. Please try again.");
+      setIsProcessing(false);
+    }
   };
 
   // Order confirmation screen
@@ -158,7 +195,7 @@ export default function CheckoutPage() {
                 <h3 className="font-semibold mb-2">Bank Transfer Details</h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Bank: First Bank of Nigeria<br />
-                  Account Name: Raylns Store<br />
+                  Account Name: Ralyn&apos;s Limited<br />
                   Account Number: 0123456789<br />
                   Amount: {formatPrice(total)}
                 </p>
@@ -478,7 +515,7 @@ export default function CheckoutPage() {
               <div className="space-y-4 mb-6 max-h-80 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex gap-4">
-                    <div className="relative w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="relative w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden shrink-0">
                       <Image
                         src={item.product.image}
                         alt={item.product.name}

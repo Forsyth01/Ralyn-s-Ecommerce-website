@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Eye,
@@ -13,11 +13,10 @@ import {
   MapPin,
   Phone,
   Mail,
-  Calendar,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatPrice, cn } from "@/app/lib/utils";
-import { mockOrders } from "../data/mockData";
+import { createClient } from "@/app/lib/supabase/client";
 import DataTable from "../components/DataTable";
 import Button from "@/app/components/ui/Button";
 
@@ -55,7 +54,7 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
   if (!order) return null;
 
   const currentStatusIndex = statusFlow.indexOf(order.status);
-  const StatusIcon = statusConfig[order.status].icon;
+  const StatusIcon = statusConfig[order.status]?.icon || Clock;
 
   return (
     <motion.div
@@ -74,9 +73,9 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
       >
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold">Order {order.id}</h2>
+            <h2 className="text-xl font-bold">Order {order.order_number}</h2>
             <p className="text-sm text-neutral-500 mt-1">
-              Placed on {new Date(order.date).toLocaleDateString("en-NG", {
+              Placed on {new Date(order.created_at).toLocaleDateString("en-NG", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
@@ -96,13 +95,13 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
           <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={cn("p-2 rounded-lg", statusConfig[order.status].color)}>
+                <div className={cn("p-2 rounded-lg", statusConfig[order.status]?.color)}>
                   <StatusIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="font-medium">Order Status</p>
                   <p className="text-sm text-neutral-500">
-                    {statusConfig[order.status].label}
+                    {statusConfig[order.status]?.label || order.status}
                   </p>
                 </div>
               </div>
@@ -174,10 +173,10 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center">
-                  <span className="font-medium">{order.customer.charAt(0)}</span>
+                  <span className="font-medium">{order.customer_name?.charAt(0) || "?"}</span>
                 </div>
                 <div>
-                  <p className="font-medium text-sm">{order.customer}</p>
+                  <p className="font-medium text-sm">{order.customer_name}</p>
                   <p className="text-xs text-neutral-500">Customer</p>
                 </div>
               </div>
@@ -205,23 +204,55 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
                 </div>
                 <div>
                   <p className="font-medium text-sm">{order.address}</p>
-                  <p className="text-xs text-neutral-500">Shipping Address</p>
+                  <p className="text-xs text-neutral-500">
+                    {order.city}{order.state ? `, ${order.state}` : ""}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Order Items */}
+          {order.items && Array.isArray(order.items) && (
+            <div>
+              <h3 className="font-semibold mb-3">Order Items</h3>
+              <div className="space-y-2">
+                {order.items.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl"
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{item.name}</p>
+                      <p className="text-xs text-neutral-500">
+                        Qty: {item.quantity}
+                        {item.selectedSize ? ` | Size: ${item.selectedSize}` : ""}
+                      </p>
+                    </div>
+                    <p className="font-medium text-sm">
+                      {formatPrice(item.price * item.quantity)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Order Summary */}
           <div>
             <h3 className="font-semibold mb-3">Order Summary</h3>
             <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-500">Items ({order.items})</span>
-                <span>{formatPrice(order.total - 2500)}</span>
+                <span className="text-neutral-500">Items ({order.items_count})</span>
+                <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-neutral-500">Shipping</span>
-                <span>{formatPrice(2500)}</span>
+                <span>{order.shipping === 0 ? "Free" : formatPrice(order.shipping)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-neutral-500">Payment</span>
+                <span className="capitalize">{order.payment_method || "N/A"}</span>
               </div>
               <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3 flex justify-between font-semibold">
                 <span>Total</span>
@@ -236,11 +267,43 @@ function OrderDetailsModal({ order, onClose, onUpdateStatus }) {
 }
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const handleUpdateStatus = (orderId, newStatus) => {
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  async function fetchOrders() {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to load orders");
+    } else {
+      setOrders(data || []);
+    }
+    setLoading(false);
+  }
+
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: newStatus })
+      .eq("id", orderId);
+
+    if (error) {
+      toast.error("Failed to update order status");
+      return;
+    }
+
     setOrders((prev) =>
       prev.map((order) =>
         order.id === orderId ? { ...order, status: newStatus } : order
@@ -259,17 +322,17 @@ export default function OrdersPage() {
 
   const columns = [
     {
-      key: "id",
+      key: "order_number",
       label: "Order ID",
       render: (value) => <span className="font-mono text-sm">{value}</span>,
     },
     {
-      key: "customer",
+      key: "customer_name",
       label: "Customer",
       render: (value, row) => (
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium">{value.charAt(0)}</span>
+            <span className="text-sm font-medium">{value?.charAt(0) || "?"}</span>
           </div>
           <div>
             <p className="font-medium text-sm">{value}</p>
@@ -279,7 +342,7 @@ export default function OrdersPage() {
       ),
     },
     {
-      key: "date",
+      key: "created_at",
       label: "Date",
       sortable: true,
       render: (value) =>
@@ -299,7 +362,7 @@ export default function OrdersPage() {
       key: "status",
       label: "Status",
       render: (value) => {
-        const config = statusConfig[value];
+        const config = statusConfig[value] || statusConfig.pending;
         return (
           <span
             className={cn(
@@ -323,6 +386,14 @@ export default function OrdersPage() {
     delivered: orders.filter((o) => o.status === "delivered").length,
     cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-2 border-neutral-300 border-t-black dark:border-neutral-600 dark:border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

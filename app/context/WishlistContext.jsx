@@ -38,6 +38,9 @@ function wishlistReducer(state, action) {
     case "CLOSE_WISHLIST":
       return { ...state, isOpen: false };
 
+    case "CLEAR_WISHLIST":
+      return { ...state, items: [] };
+
     case "LOAD_WISHLIST":
       return { ...state, items: action.payload };
 
@@ -98,6 +101,11 @@ export function WishlistProvider({ children }) {
     return state.items.some((item) => item.id === productId);
   };
 
+  const clearWishlist = () => {
+    dispatch({ type: "CLEAR_WISHLIST" });
+    toast.success("Wishlist cleared");
+  };
+
   const toggleWishlist = () => dispatch({ type: "TOGGLE_WISHLIST" });
   const openWishlist = () => dispatch({ type: "OPEN_WISHLIST" });
   const closeWishlist = () => dispatch({ type: "CLOSE_WISHLIST" });
@@ -111,6 +119,7 @@ export function WishlistProvider({ children }) {
     removeItem,
     toggleItem,
     isInWishlist,
+    clearWishlist,
     toggleWishlist,
     openWishlist,
     closeWishlist,

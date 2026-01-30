@@ -1,5 +1,5 @@
-export const SITE_NAME = "Ralyn's Ltd";
-export const SITE_DESCRIPTION = "Discover your style with our curated collection of Jewelry, Lipgloss, and Gadgets.";
+export const SITE_NAME = "Ralyn’s Ltd";
+export const SITE_DESCRIPTION = "Discover your style with our curated collection of Jewelry, Lipgloss, Gadgets, and Fashion.";
 
 export const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -13,7 +13,14 @@ export const CATEGORIES = [
   { id: "jewelry", name: "Jewelry", slug: "jewelry" },
   { id: "lipgloss", name: "Lipgloss", slug: "lipgloss" },
   { id: "gadgets", name: "Gadgets", slug: "gadgets" },
+  { id: "fashion", name: "Fashion", slug: "fashion" },
 ];
+
+// Fashion subcategories
+export const FASHION_SUBCATEGORIES = ["Clothes", "Bags", "Shoes", "Wristwatches", "Accessories"];
+
+// Size options for clothing
+export const CLOTHING_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export const SOCIAL_LINKS = {
   instagram: "https://instagram.com/raylns",
@@ -23,7 +30,7 @@ export const SOCIAL_LINKS = {
 };
 
 export const CONTACT_INFO = {
-  email: "hello@raylns.com",
+  email: "hello@Ralyn.com",
   phone: "+1 (555) 123-4567",
   address: "123 Style Street, Fashion City, FC 12345",
 };

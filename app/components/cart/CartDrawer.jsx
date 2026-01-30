@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag } from "lucide-react";
+import { X, ShoppingBag, AlertTriangle } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { formatPrice } from "@/app/lib/utils";
 import Button from "@/app/components/ui/Button";
@@ -11,10 +12,16 @@ import CartItem from "./CartItem";
 export default function CartDrawer() {
   const router = useRouter();
   const { items, isOpen, closeCart, subtotal, itemCount, clearCart } = useCart();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleCheckout = () => {
     closeCart();
     router.push("/checkout");
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    setShowConfirm(false);
   };
 
   return (
@@ -87,13 +94,56 @@ export default function CartDrawer() {
                   Checkout
                 </Button>
                 <button
-                  onClick={clearCart}
+                  onClick={() => setShowConfirm(true)}
                   className="w-full text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
                 >
                   Clear Cart
                 </button>
               </div>
             )}
+
+            {/* Clear Cart Confirmation Modal */}
+            <AnimatePresence>
+              {showConfirm && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center p-6"
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="bg-white dark:bg-neutral-900 rounded-2xl p-6 w-full max-w-sm shadow-xl"
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">Clear Cart?</h3>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
+                        Are you sure you want to remove all {itemCount} item{itemCount !== 1 ? "s" : ""} from your cart? This action cannot be undone.
+                      </p>
+                      <div className="flex gap-3 w-full">
+                        <button
+                          onClick={() => setShowConfirm(false)}
+                          className="flex-1 px-4 py-3 rounded-xl border border-neutral-300 dark:border-neutral-700 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleClearCart}
+                          className="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </>
       )}

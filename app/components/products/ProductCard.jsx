@@ -42,8 +42,8 @@ export default function ProductCard({ product, index = 0 }) {
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 pointer-events-none">
-            {product.isNew && <Badge variant="new">New</Badge>}
-            {product.isSale && <Badge variant="sale">Sale</Badge>}
+            {(product.is_new || product.isNew) && <Badge variant="new">New</Badge>}
+            {(product.is_sale || product.isSale) && <Badge variant="sale">Sale</Badge>}
           </div>
 
           {/* Wishlist Button */}
@@ -97,9 +97,9 @@ export default function ProductCard({ product, index = 0 }) {
           </h3>
           <div className="flex items-center gap-2">
             <span className="font-semibold">{formatPrice(product.price)}</span>
-            {product.originalPrice && (
+            {(product.original_price || product.originalPrice) && (
               <span className="text-sm text-neutral-400 line-through">
-                {formatPrice(product.originalPrice)}
+                {formatPrice(product.original_price || product.originalPrice)}
               </span>
             )}
           </div>
