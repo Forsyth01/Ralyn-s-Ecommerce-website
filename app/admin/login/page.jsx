@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, AlertCircle } from "lucide-react";
 import { createClient } from "@/app/lib/supabase/client";
 import Button from "@/app/components/ui/Button";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -188,5 +188,19 @@ export default function AdminLoginPage() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 z-[100] bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-neutral-300 border-t-black dark:border-neutral-600 dark:border-t-white rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
