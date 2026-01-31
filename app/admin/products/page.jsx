@@ -50,6 +50,8 @@ function ProductModal({ product, onClose, onSave }) {
           is_sale: product.is_sale ?? false,
           is_featured: product.is_featured ?? false,
           sizes: product.sizes || [],
+          stock_quantity: product.stock_quantity ?? 0,
+          low_stock_threshold: product.low_stock_threshold ?? 5,
         }
       : {
           name: "",
@@ -64,6 +66,8 @@ function ProductModal({ product, onClose, onSave }) {
           is_sale: false,
           is_featured: false,
           sizes: [],
+          stock_quantity: 25,
+          low_stock_threshold: 5,
         }
   );
 
@@ -283,6 +287,45 @@ function ProductModal({ product, onClose, onSave }) {
                 }
                 className="w-full px-4 py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                 placeholder="0"
+              />
+            </div>
+          </div>
+
+          {/* Inventory Management */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Stock Quantity *
+              </label>
+              <input
+                type="number"
+                value={formData.stock_quantity}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock_quantity: parseInt(e.target.value) || 0 })
+                }
+                className="w-full px-4 py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                placeholder="0"
+                min="0"
+              />
+              {product && formData.stock_quantity <= formData.low_stock_threshold && (
+                <p className="text-xs mt-1 text-amber-600 dark:text-amber-500">
+                  {formData.stock_quantity === 0 ? "⚠ Out of stock" : "⚠ Low stock"}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Low Stock Threshold
+              </label>
+              <input
+                type="number"
+                value={formData.low_stock_threshold}
+                onChange={(e) =>
+                  setFormData({ ...formData, low_stock_threshold: parseInt(e.target.value) || 5 })
+                }
+                className="w-full px-4 py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl border-none outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                placeholder="5"
+                min="1"
               />
             </div>
           </div>

@@ -57,6 +57,26 @@ export async function createOrder(orderData) {
       customerId = newCustomer.id;
     }
 
+    // Check stock availability for all items
+    for (const item of orderData.items) {
+      const { data: product, error: productError } = await supabase
+        .from("products")
+        .select("stock_quantity, name")
+        .eq("id", item.id)
+        .single();
+
+      if (productError) {
+        console.error("Error fetching product:", productError);
+        return { error: `Failed to verify stock for ${item.name}` };
+      }
+
+      if (product.stock_quantity < item.quantity) {
+        return {
+          error: `Insufficient stock for ${product.name}. Only ${product.stock_quantity} available.`,
+        };
+      }
+    }
+
     // Create the order
     const orderNumber = generateOrderNumber();
 
@@ -87,9 +107,24 @@ export async function createOrder(orderData) {
       return { error: "Failed to create order" };
     }
 
+    // Decrement stock for each item
+    for (const item of orderData.items) {
+      const { error: stockError } = await supabase.rpc("update_product_stock", {
+        product_id: item.id,
+        quantity_sold: item.quantity,
+      });
+
+      if (stockError) {
+        console.error("Error updating stock:", stockError);
+        // Log the error but don't fail the order since it's already created
+        // In production, you might want to implement a rollback mechanism
+      }
+    }
+
     revalidatePath("/admin/orders");
     revalidatePath("/admin/customers");
     revalidatePath("/admin");
+    revalidatePath("/admin/products");
 
     return { data: order };
   } catch (error) {

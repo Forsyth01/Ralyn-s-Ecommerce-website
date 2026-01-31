@@ -17,6 +17,8 @@ export default function ProductCard({ product, index = 0 }) {
   const { toggleItem, isInWishlist } = useWishlist();
 
   const isWishlisted = isInWishlist(product.id);
+  const isOutOfStock = product.stock_quantity === 0;
+  const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= (product.low_stock_threshold || 5);
 
   return (
     <>
@@ -42,8 +44,16 @@ export default function ProductCard({ product, index = 0 }) {
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 pointer-events-none">
-            {(product.is_new || product.isNew) && <Badge variant="new">New</Badge>}
-            {(product.is_sale || product.isSale) && <Badge variant="sale">Sale</Badge>}
+            {isOutOfStock ? (
+              <Badge variant="sale">Out of Stock</Badge>
+            ) : isLowStock ? (
+              <Badge variant="new">Low Stock</Badge>
+            ) : (
+              <>
+                {(product.is_new || product.isNew) && <Badge variant="new">New</Badge>}
+                {(product.is_sale || product.isSale) && <Badge variant="sale">Sale</Badge>}
+              </>
+            )}
           </div>
 
           {/* Wishlist Button */}
@@ -68,12 +78,18 @@ export default function ProductCard({ product, index = 0 }) {
           <div className="absolute bottom-0 left-0 right-0 p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 z-20">
             <div className="flex gap-2">
               <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => addToCart(product)}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white dark:bg-white dark:text-black rounded-full font-medium text-sm transition-colors hover:bg-neutral-800 dark:hover:bg-neutral-200"
+                whileTap={!isOutOfStock ? { scale: 0.98 } : {}}
+                onClick={() => !isOutOfStock && addToCart(product)}
+                disabled={isOutOfStock}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-medium text-sm transition-colors",
+                  isOutOfStock
+                    ? "bg-neutral-300 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 cursor-not-allowed"
+                    : "bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200"
+                )}
               >
                 <ShoppingBag className="w-4 h-4" />
-                Add to Cart
+                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}

@@ -14,6 +14,7 @@ import {
   CheckCircle,
   Truck,
   Eye,
+  AlertTriangle,
 } from "lucide-react";
 import { formatPrice, cn } from "@/app/lib/utils";
 import { createClient } from "@/app/lib/supabase/client";
@@ -87,20 +88,31 @@ export default function AdminDashboard() {
     deliveredOrders: 0,
   });
   const [recentOrders, setRecentOrders] = useState([]);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboardData() {
       const supabase = createClient();
 
-      const [productsRes, ordersRes, customersRes] = await Promise.all([
+      const [productsRes, ordersRes, customersRes, allProductsRes] = await Promise.all([
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("orders").select("*").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
+        supabase
+          .from("products")
+          .select("id, name, stock_quantity, low_stock_threshold")
+          .order("stock_quantity", { ascending: true }),
       ]);
 
       const orders = ordersRes.data || [];
       const totalRevenue = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
+
+      // Filter low stock products client-side
+      const allProducts = allProductsRes.data || [];
+      const lowStock = allProducts
+        .filter((p) => p.stock_quantity <= (p.low_stock_threshold || 5))
+        .slice(0, 5);
 
       setStats({
         totalRevenue,
@@ -114,6 +126,7 @@ export default function AdminDashboard() {
       });
 
       setRecentOrders(orders.slice(0, 6));
+      setLowStockProducts(lowStock);
       setLoading(false);
     }
 
@@ -242,6 +255,44 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Low Stock Alerts */}
+          {lowStockProducts.length > 0 && (
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-4 mt-4">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                <h3 className="font-medium text-sm text-amber-900 dark:text-amber-100">
+                  Low Stock Alert
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {lowStockProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="text-amber-800 dark:text-amber-200 truncate">
+                      {product.name}
+                    </span>
+                    <span className={cn(
+                      "font-medium px-2 py-0.5 rounded text-xs",
+                      product.stock_quantity === 0
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                    )}>
+                      {product.stock_quantity === 0 ? "Out" : product.stock_quantity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/admin/products"
+                className="text-xs text-amber-700 dark:text-amber-400 hover:underline mt-3 block"
+              >
+                Manage inventory →
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* Recent Orders */}
