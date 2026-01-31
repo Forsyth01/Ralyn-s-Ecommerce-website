@@ -73,18 +73,18 @@ export function WishlistProvider({ children }) {
   const addItem = (product) => {
     const exists = state.items.some((item) => item.id === product.id);
     if (exists) {
-      toast.info(`${product.name} is already in your wishlist`);
+      toast.info(`${product.name} is already in your wishlist`, { toastId: "wishlist-action" });
       return;
     }
     dispatch({ type: "ADD_ITEM", payload: product });
-    toast.success(`${product.name} added to wishlist`);
+    toast.success(`${product.name} added to wishlist`, { toastId: "wishlist-action" });
   };
 
   const removeItem = (productId) => {
     const item = state.items.find((item) => item.id === productId);
     dispatch({ type: "REMOVE_ITEM", payload: productId });
     if (item) {
-      toast.info(`${item.name} removed from wishlist`);
+      toast.info(`${item.name} removed from wishlist`, { toastId: "wishlist-action" });
     }
   };
 
@@ -103,7 +103,7 @@ export function WishlistProvider({ children }) {
 
   const clearWishlist = () => {
     dispatch({ type: "CLEAR_WISHLIST" });
-    toast.success("Wishlist cleared");
+    toast.success("Wishlist cleared", { toastId: "wishlist-action" });
   };
 
   const toggleWishlist = () => dispatch({ type: "TOGGLE_WISHLIST" });

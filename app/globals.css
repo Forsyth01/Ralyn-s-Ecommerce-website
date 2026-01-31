@@ -75,6 +75,18 @@ body {
   font-family: var(--font-sans), "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
 }
 
+/* Fast toast transitions */
+.Toastify__toast-container {
+  --toastify-toast-min-height: 64px;
+}
+
+.Toastify__bounce-enter--top-right,
+.Toastify__bounce-enter--bottom-right,
+.Toastify__bounce-exit--top-right,
+.Toastify__bounce-exit--bottom-right {
+  animation-duration: 100ms !important;
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;

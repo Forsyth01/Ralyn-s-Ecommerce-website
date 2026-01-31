@@ -13,14 +13,14 @@ function ToastWrapper({ children }) {
       {children}
       <ToastContainer
         position="bottom-right"
-        autoClose={1500}
+        autoClose={2000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
         theme={isDark ? "dark" : "light"}
       />
     </>

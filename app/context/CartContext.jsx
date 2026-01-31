@@ -94,14 +94,14 @@ export function CartProvider({ children }) {
 
   const addItem = (product) => {
     dispatch({ type: "ADD_ITEM", payload: product });
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${product.name} added to cart`, { toastId: "cart-action" });
   };
 
   const removeItem = (productId) => {
     const item = state.items.find((item) => item.product.id === productId);
     dispatch({ type: "REMOVE_ITEM", payload: productId });
     if (item) {
-      toast.info(`${item.product.name} removed from cart`);
+      toast.info(`${item.product.name} removed from cart`, { toastId: "cart-action" });
     }
   };
 
@@ -111,7 +111,7 @@ export function CartProvider({ children }) {
 
   const clearCart = () => {
     dispatch({ type: "CLEAR_CART" });
-    toast.info("Cart cleared");
+    toast.info("Cart cleared", { toastId: "cart-action" });
   };
 
   const toggleCart = () => dispatch({ type: "TOGGLE_CART" });
