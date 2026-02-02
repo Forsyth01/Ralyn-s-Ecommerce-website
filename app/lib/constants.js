@@ -23,16 +23,16 @@ export const FASHION_SUBCATEGORIES = ["Clothes", "Bags", "Shoes", "Wristwatches"
 export const CLOTHING_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export const SOCIAL_LINKS = {
-  instagram: "https://instagram.com/raylns",
-  twitter: "https://twitter.com/raylns",
-  facebook: "https://facebook.com/raylns",
-  tiktok: "https://tiktok.com/@raylns",
+  instagram: "https://instagram.com/ralynslimited",
+  tiktok: "https://www.tiktok.com/@ralyns_limited",
+  tiktok2: "https://www.tiktok.com/@ralyns_lipcare",
 };
 
 export const CONTACT_INFO = {
-  email: "hello@Ralyn.com",
-  phone: "+1 (555) 123-4567",
-  address: "123 Style Street, Fashion City, FC 12345",
+  email: "ralynsluxe01@gmail.com",
+  phone: "+234 916 186 1216",
+  phone2: "0704 867 3441",
+  address: "Ugbowo, Benin City, Nigeria",
 };
 
 export const BUSINESS_HOURS = {

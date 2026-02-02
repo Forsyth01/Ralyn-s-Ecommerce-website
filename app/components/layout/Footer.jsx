@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Instagram, Twitter, Facebook } from "lucide-react";
-import { SITE_NAME, NAV_LINKS, SOCIAL_LINKS, CONTACT_INFO, CATEGORIES } from "@/app/lib/constants";
+import { Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { SITE_NAME, SOCIAL_LINKS, CONTACT_INFO } from "@/app/lib/constants";
 import Container from "./Container";
 
 const footerLinks = {
@@ -54,24 +54,30 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  href={SOCIAL_LINKS.twitter}
+                  href={SOCIAL_LINKS.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 bg-neutral-200 dark:bg-neutral-800 rounded-full hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
-                  aria-label="Twitter"
+                  aria-label="TikTok"
+                  title="@ralyns_limited"
                 >
-                  <Twitter className="w-4 h-4" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.28a8.18 8.18 0 0 0 4.76 1.52V6.35a4.89 4.89 0 0 1-1-.15z" />
+                  </svg>
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  href={SOCIAL_LINKS.facebook}
+                  href={SOCIAL_LINKS.tiktok2}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 bg-neutral-200 dark:bg-neutral-800 rounded-full hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
-                  aria-label="Facebook"
+                  aria-label="TikTok Lip Care"
+                  title="@ralyns_lipcare"
                 >
-                  <Facebook className="w-4 h-4" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.28a8.18 8.18 0 0 0 4.76 1.52V6.35a4.89 4.89 0 0 1-1-.15z" />
+                  </svg>
                 </motion.a>
               </div>
             </div>
@@ -123,20 +129,36 @@ export default function Footer() {
                 <li>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
-                    className="hover:text-black dark:hover:text-white transition-colors"
+                    className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"
                   >
+                    <Mail className="w-4 h-4 shrink-0" />
                     {CONTACT_INFO.email}
                   </a>
                 </li>
                 <li>
                   <a
                     href={`tel:${CONTACT_INFO.phone}`}
-                    className="hover:text-black dark:hover:text-white transition-colors"
+                    className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"
                   >
+                    <Phone className="w-4 h-4 shrink-0" />
                     {CONTACT_INFO.phone}
                   </a>
                 </li>
-                <li className="leading-relaxed">{CONTACT_INFO.address}</li>
+                {CONTACT_INFO.phone2 && (
+                  <li>
+                    <a
+                      href={`tel:${CONTACT_INFO.phone2}`}
+                      className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"
+                    >
+                      <Phone className="w-4 h-4 shrink-0" />
+                      {CONTACT_INFO.phone2}
+                    </a>
+                  </li>
+                )}
+                <li className="flex items-center gap-2 leading-relaxed">
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  {CONTACT_INFO.address}
+                </li>
               </ul>
             </div>
           </div>

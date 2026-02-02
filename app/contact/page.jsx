@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, Instagram } from "lucide-react";
 import { toast } from "react-toastify";
 import Container from "@/app/components/layout/Container";
 import Input from "@/app/components/ui/Input";
@@ -42,7 +42,7 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="py-8 md:py-12">
+    <section className="pt-24 pb-16">
       <Container>
         {/* Page Header */}
         <motion.div
@@ -155,10 +155,18 @@ export default function ContactPage() {
                   <h3 className="font-semibold mb-1">Phone</h3>
                   <a
                     href={`tel:${CONTACT_INFO.phone}`}
-                    className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                    className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors block"
                   >
                     {CONTACT_INFO.phone}
                   </a>
+                  {CONTACT_INFO.phone2 && (
+                    <a
+                      href={`tel:${CONTACT_INFO.phone2}`}
+                      className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors block"
+                    >
+                      {CONTACT_INFO.phone2}
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -193,30 +201,37 @@ export default function ContactPage() {
             {/* Social Links */}
             <div>
               <h3 className="font-semibold mb-4">Follow Us</h3>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-3">
                 <a
                   href={SOCIAL_LINKS.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                 >
+                  <Instagram className="w-4 h-4" />
                   Instagram
                 </a>
                 <a
-                  href={SOCIAL_LINKS.twitter}
+                  href={SOCIAL_LINKS.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                 >
-                  Twitter
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.28a8.18 8.18 0 0 0 4.76 1.52V6.35a4.89 4.89 0 0 1-1-.15z" />
+                  </svg>
+                  TikTok
                 </a>
                 <a
-                  href={SOCIAL_LINKS.facebook}
+                  href={SOCIAL_LINKS.tiktok2}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                 >
-                  Facebook
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.28a8.18 8.18 0 0 0 4.76 1.52V6.35a4.89 4.89 0 0 1-1-.15z" />
+                  </svg>
+                  Lip Care
                 </a>
               </div>
             </div>
