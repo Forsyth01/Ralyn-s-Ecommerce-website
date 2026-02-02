@@ -16,7 +16,7 @@ export async function signIn(formData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "Invalid email or password" };
   }
 
   revalidatePath("/admin", "layout");

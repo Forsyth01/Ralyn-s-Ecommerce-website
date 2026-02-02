@@ -3,18 +3,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Heart, ShoppingBag, Menu, Sun, Moon } from "lucide-react";
+import { Search, Heart, ShoppingBag, Menu, Sun, Moon, Shield } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { useTheme } from "@/app/context/ThemeContext";
 import { NAV_LINKS, SITE_NAME } from "@/app/lib/constants";
 import { cn } from "@/app/lib/utils";
+import { createClient } from "@/app/lib/supabase/client";
 import Container from "./Container";
 import MobileMenu from "./MobileMenu";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toggleCart, itemCount: cartCount } = useCart();
   const { toggleWishlist, itemCount: wishlistCount } = useWishlist();
   const { theme, toggleTheme, isDark } = useTheme();
@@ -25,6 +27,23 @@ export default function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: adminUser } = await supabase
+        .from("admin_users")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (adminUser) setIsAdmin(true);
+    }
+    checkAdmin();
   }, []);
 
   return (
@@ -76,6 +95,20 @@ export default function Navbar() {
 
             {/* Icons */}
             <div className="flex items-center gap-1 md:gap-2">
+              {isAdmin && (
+                <Link href="/admin">
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
+                    aria-label="Admin Dashboard"
+                    title="Admin Dashboard"
+                  >
+                    <Shield className="w-5 h-5" />
+                  </motion.div>
+                </Link>
+              )}
+
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}

@@ -83,10 +83,19 @@ export async function getProductsByCategory(category) {
 
 export async function searchProducts(searchTerm) {
   const supabase = await createClient();
+
+  // Sanitize search input: trim, limit length, escape special PostgREST characters
+  const sanitized = String(searchTerm || "")
+    .trim()
+    .slice(0, 100)
+    .replace(/[%_\\]/g, "");
+
+  if (!sanitized) return [];
+
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`)
+    .or(`name.ilike.%${sanitized}%,description.ilike.%${sanitized}%,category.ilike.%${sanitized}%`)
     .order("created_at", { ascending: false });
 
   if (error) {
