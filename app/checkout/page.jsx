@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useCart } from "@/app/context/CartContext";
 import { formatPrice } from "@/app/lib/utils";
 import { createOrder } from "@/app/lib/actions/orders";
+import { sendOrderEmails } from "@/app/lib/email";
 import Container from "@/app/components/layout/Container";
 import Button from "@/app/components/ui/Button";
 import Input from "@/app/components/ui/Input";
@@ -160,6 +161,26 @@ export default function CheckoutPage() {
         setIsProcessing(false);
         return;
       }
+
+      // Send email notifications (don't block on failure)
+      sendOrderEmails({
+        orderNumber: result.orderNumber,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        address: formData.apartment
+          ? `${formData.address}, ${formData.apartment}`
+          : formData.address,
+        city: formData.city,
+        state: formData.state,
+        items: orderItems,
+        itemsCount: itemCount,
+        subtotal,
+        shipping,
+        total,
+        paymentMethod,
+      }).catch((err) => console.error("Email send error:", err));
 
       setIsProcessing(false);
       setOrderComplete(true);

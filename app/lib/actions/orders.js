@@ -224,7 +224,7 @@ export async function createOrder(orderData) {
     revalidatePath("/admin");
     revalidatePath("/admin/products");
 
-    return { data: order };
+    return { data: order, orderNumber };
   } catch (error) {
     console.error("Order creation error:", error);
     return { error: "An unexpected error occurred" };

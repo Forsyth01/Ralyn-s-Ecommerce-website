@@ -75,29 +75,30 @@ export default function ProductCard({ product, index = 0 }) {
           </motion.button>
 
           {/* Action Buttons - Always visible on mobile, hover on desktop */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 z-20">
-            <div className="flex gap-2">
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 z-20">
+            <div className="flex gap-1.5 sm:gap-2">
               <motion.button
                 whileTap={!isOutOfStock ? { scale: 0.98 } : {}}
                 onClick={() => !isOutOfStock && addToCart(product)}
                 disabled={isOutOfStock}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-medium text-sm transition-colors",
+                  "flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-3 rounded-full font-medium text-[10px] sm:text-sm transition-colors",
                   isOutOfStock
                     ? "bg-neutral-300 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 cursor-not-allowed"
                     : "bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200"
                 )}
               >
-                <ShoppingBag className="w-4 h-4" />
-                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+                <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="sm:hidden">{isOutOfStock ? "Sold Out" : "Add"}</span>
+                <span className="hidden sm:inline">{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsQuickViewOpen(true)}
-                className="p-3 bg-white dark:bg-black rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                className="p-2 sm:p-3 bg-white dark:bg-black rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
                 aria-label="Quick view"
               >
-                <Eye className="w-5 h-5" />
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
             </div>
           </div>
