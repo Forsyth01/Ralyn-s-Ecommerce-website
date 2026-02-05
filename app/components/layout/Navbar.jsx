@@ -8,26 +8,16 @@ import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { useTheme } from "@/app/context/ThemeContext";
 import { NAV_LINKS, SITE_NAME } from "@/app/lib/constants";
-import { cn } from "@/app/lib/utils";
 import { createClient } from "@/app/lib/supabase/client";
 import Container from "./Container";
 import MobileMenu from "./MobileMenu";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const { toggleCart, itemCount: cartCount } = useCart();
   const { toggleWishlist, itemCount: wishlistCount } = useWishlist();
-  const { theme, toggleTheme, isDark } = useTheme();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { toggleTheme, isDark } = useTheme();
 
   useEffect(() => {
     async function checkAdmin() {
@@ -48,23 +38,19 @@ export default function Navbar() {
 
   return (
     <>
-    <div className="bg-black">
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={cn(
-          "fixed top-0  left-0 right-0 z-50 transition-all duration-300",
-          isScrolled
-            ? "bg-white/90 backdrop-blur-md shadow-sm dark:bg-black/90"
-            : "bg-transparent"
-        )}
+        className=
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm dark:bg-black/90"
+        
       >
         <Container>
-          <nav className="flex items-center justify-between h-16 md:h-20">
+          <nav className="flex items-center justify-between h-16 md:h-20 ">
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 -ml-2 md:hidden"
+              className="p-2 -ml-2 md:hidden text-black dark:text-white"
               aria-label="Open menu"
             >
               <Menu className="w-6 h-6" />
@@ -73,7 +59,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <motion.span
-                className="text-xl md:text-2xl font-semibold tracking-tight"
+                className="text-xl md:text-2xl font-semibold tracking-tight text-black dark:text-white"
                 style={{ fontFamily: "var(--font-logo)" }}
                 whileHover={{ scale: 1.02 }}
               >
@@ -95,7 +81,7 @@ export default function Navbar() {
             </div>
 
             {/* Icons */}
-            <div className="flex items-center gap-1 md:gap-2">
+            <div className="flex items-center gap-1 md:gap-2 text-black dark:text-white">
               {isAdmin && (
                 <Link href="/admin">
                   <motion.div
@@ -168,7 +154,6 @@ export default function Navbar() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
-    </div>
     </>
   );
 }

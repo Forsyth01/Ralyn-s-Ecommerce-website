@@ -64,7 +64,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[70vh] flex items-center overflow-hidden">
       {/* Slideshow Background */}
       {heroSlides.map((slide, index) => (
         <motion.div
@@ -89,7 +89,10 @@ export default function Hero() {
       ))}
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/70" />
+
+      {/* Bottom Fade Effect */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
 
       <Container className="relative z-10">
         <div className="max-w-3xl">
@@ -112,7 +115,7 @@ export default function Hero() {
           >
             {currentSlide.title}
             <br />
-            <span className="font-semibold">{currentSlide.highlight}</span>
+            <span className="font-black">{currentSlide.highlight}</span>
           </motion.h1>
 
           <motion.p
