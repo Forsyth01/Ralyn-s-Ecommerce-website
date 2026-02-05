@@ -64,7 +64,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[65vh] flex items-center overflow-hidden">
       {/* Slideshow Background */}
       {heroSlides.map((slide, index) => (
         <motion.div
@@ -111,7 +111,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-7xl font-light tracking-tight leading-[1.1] mb-6 text-white"
+            className="text-5xl md:text-5xl lg:text-7xl font-light tracking-tight leading-[1.1] mb-6 text-white"
           >
             {currentSlide.title}
             <br />
