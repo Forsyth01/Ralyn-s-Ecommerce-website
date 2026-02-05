@@ -89,10 +89,7 @@ export default function Hero() {
       ))}
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/70" />
-
-      {/* Bottom Fade Effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white dark:from-black to-transparent" />
+      <div className="absolute inset-0 bg-black/60" />
 
       <Container className="relative z-10">
         <div className="max-w-3xl">

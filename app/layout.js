@@ -29,10 +29,25 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // Script to prevent flash of wrong theme on load
+  const themeScript = `
+    (function() {
+      try {
+        var theme = localStorage.getItem('raylns-theme');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  `;
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
-        className={`${plusJakarta.variable} ${plusJakarta.className} ${jetbrainsMono.variable} ${playfair.variable} antialiased`}
+        className={`${plusJakarta.variable} ${plusJakarta.className} ${jetbrainsMono.variable} ${playfair.variable} antialiased bg-white dark:bg-black`}
       >
         <Providers>
           <Navbar />
